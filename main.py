@@ -5,6 +5,7 @@ from pyshorteners import Shortener
 from PyQt5.QtCore import pyqtSlot
 import qrcode
 from os import path
+import sys
 
 def CREATE_SHORT_URL(url):
     link = Shortener()
@@ -14,11 +15,14 @@ def CREATE_QRCODE(link):
     img = qrcode.make(link)
     img.save("qrcode.png")
 
+def loadFile(file):
+    base_path = getattr(sys, "_MEIPASS", path.dirname(path.abspath(__file__)))
+    return path.join(base_path, file)
 
 class QrCodeBuilder(QMainWindow):
     def __init__(self):
         super().__init__()
-        loadUi("interface.ui", self)
+        loadUi(loadFile("./interface.ui"), self)
 
     def getURL(self):
         return self.txtUrl.text()
@@ -30,11 +34,15 @@ class QrCodeBuilder(QMainWindow):
     def on_btnGerar_clicked(self):
         valor = self.getURL()
         if valor:
-            url = CREATE_SHORT_URL(valor)
-            CREATE_QRCODE(url)
-            self.setURLCurta(url)
-            self.img.setPixmap(QPixmap("qrcode.png"))
-            self.btnSalvar.setEnabled(True)
+            try:
+                url = CREATE_SHORT_URL(valor)
+                CREATE_QRCODE(url)
+                self.setURLCurta(url)
+                self.img.setPixmap(QPixmap("qrcode.png"))
+                self.btnSalvar.setEnabled(True)
+            except Exception as error:
+                self.showMessage("Erro", "Link de URL invalido!!")
+                print('log:', error )
             
         else:
             self.showMessage("Errou", "Voce esquece de alguma coisa?")
