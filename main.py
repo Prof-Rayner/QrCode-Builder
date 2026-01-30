@@ -14,11 +14,6 @@ def CREATE_QRCODE(link):
     img = qrcode.make(link)
     img.save("qrcode.png")
 
-def GET_LOCAL_PATH(myPath):
-    return f''
-
-
-
 
 class QrCodeBuilder(QMainWindow):
     def __init__(self):
@@ -50,10 +45,11 @@ class QrCodeBuilder(QMainWindow):
 
     def salvar(self):
         nomeArquivo, _ = QFileDialog.getSaveFileName(self, "Salvar Imagem")
+        
         if nomeArquivo:
             caminho = path.dirname(nomeArquivo)
             nome = nomeArquivo.removeprefix(caminho)
-
+            
             # ler a foto do QRCODE
             with open("qrcode.png", "rb") as fotoQrcode:
                 dadosQrcode = fotoQrcode.read()
@@ -61,7 +57,15 @@ class QrCodeBuilder(QMainWindow):
             # salvar a foto aonde o user escolheu
             with open(caminho+f"{nome}.png", "wb") as foto:
                 foto.write(dadosQrcode)
-            
+
+            self.showMessage("Imagem", "Imagem salva com sucesso")
+            self.reset()
+    
+    def reset(self):
+        self.txtUrl.setText("")
+        self.txtUrlShort.setText("")
+        self.img.setPixmap(QPixmap())
+        self.btnSalvar.setEnabled(False)
 
     def showMessage(self, title, message):
         QMessageBox.information(self, title, message)
